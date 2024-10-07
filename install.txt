@@ -1,0 +1,12 @@
+pip install flask flask-cors
+
+run the server in the main folder:
+python app.py
+
+
+on login-page:
+
+npm install
+
+npm start
+
