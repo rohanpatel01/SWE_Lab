@@ -5,8 +5,8 @@ import "./LoginPage.css"; // Import the corresponding CSS for this component
 const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
 
   //TODO: use the below hooks to capture username and password data
-  const [username, setUsername] = React.useState('userPlaceholder'); // Track username input
-  const [password, setPassword] = React.useState('passPlaceholder'); // Track password input
+  const [username, setUsername] = React.useState(''); // Track username input
+  const [password, setPassword] = React.useState(''); // Track password input
 
   const submitCredentials = async (event) => {
     event.preventDefault(); // Prevent the page from refreshing
@@ -50,11 +50,11 @@ const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
             <h2>Login.</h2>
             <div className="input-field">
               <label>Username</label>
-              <input type="text" placeholder="Type here" />
+              <input type="text" placeholder="Type here" value={username} onChange={(e) => setUsername(e.target.value)}/>
             </div>
             <div className="input-field">
               <label>Password</label>
-              <input type="password" placeholder="Type here" />
+              <input type="password" placeholder="Type here" value={password} onChange={(e) => setPassword(e.target.value)}/>
             </div>
             <div className="button-group">
               <button className="new-button">New Here?</button>
