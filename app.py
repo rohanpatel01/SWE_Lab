@@ -1,22 +1,13 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-users = [{"username": "user1", "password": "password123"}]  
-
-@app.route('/signup', methods=['POST'])
-def signup():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    # Check if the username already exists
-    if any(user['username'] == username for user in users):
-        return jsonify({"message": "Username already exists"}), 400
-
-    # Add new user if the username doesn't exist
-    users.append({"username": username, "password": password})
-    return jsonify({"message": "User registered successfully"}), 201
+# Hardcoded valid users and passwords
+users = {
+    "bingus": "ryat",
+}
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -24,11 +15,13 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    for user in users:
-        if user['username'] == username and user['password'] == password:
-            return jsonify({"message": "Login successful"}), 200
+    if not username or not password:
+        return jsonify({"message": "Username and password are required"}), 400
 
-    return jsonify({"message": "Invalid username or password"}), 401
+    if username in users and users[username] == password:
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"message": "Invalid username or password"}), 401
 
 if __name__ == '__main__':
     app.run(debug=True)

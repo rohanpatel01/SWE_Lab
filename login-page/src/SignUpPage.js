@@ -6,27 +6,8 @@ const SignUpPage = ({ onSignUp, message, onLoginRedirect }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const sendInfo = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-
-        onSignUp(username, password); // Call onSignUp to log in 
-      } else {
-        alert(data.message); 
-      }
-    } catch (error) {
-      alert("An error occurred. Please try again.");
-    }
+  const sendInfo = () => {
+    onSignUp(username, password); 
   };
 
   return (
@@ -42,7 +23,7 @@ const SignUpPage = ({ onSignUp, message, onLoginRedirect }) => {
         </div>
 
         <div className="signup-form">
-          <h2>Sign Up.</h2>
+          <h2>SIGN UP.</h2>
 
           {/* Username Input */}
           <div className="input-field">

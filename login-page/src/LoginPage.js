@@ -56,7 +56,8 @@ const LoginPage = ({ onLogin, message, onSignUp }) => {
             </button>
           </div>
         </div>
-        
+
+        {/* Display Login Message */}
         <p className="login-message">{message}</p>
       </div>
     </div>
