@@ -1,12 +1,13 @@
+In backend folder
 pip install flask flask-cors
 
-run the server in the main folder:
+run the server in the backend folder:
 python app.py
 
 
-on login-page:
-
+In frontend folder
 npm install
 
+run the server in the frontend folder
 npm start
 
