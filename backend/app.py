@@ -39,5 +39,26 @@ def submit_credentials():
     # Respond back to the frontend
     return jsonify({'status': 'success', 'message': 'Credentials saved'})
 
+# Route to handle user creation
+@app.route('/create_user', methods=['POST'])
+def create_user():
+    # Get the JSON data sent from React
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    #TODO: Encrypt pass word and then query database for existing user.
+    #TODO: If no existing user from database send write instruction to database and success to react.
+    #TODO: If existing user, do not write to database and return existing user message
+
+    return
+
+# Encrypt password before querying or storing in database
+def encrypt_password(password:str) -> str:
+    #TODO: Complete with hashing or some encryption method
+    pass
+
+
 if __name__ == '__main__':
     app.run(host='localhost', debug=True)
+
