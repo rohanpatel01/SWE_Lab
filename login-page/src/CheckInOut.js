@@ -1,24 +1,24 @@
+// src/CheckInOut.js
 import React, { useState } from 'react';
 import './CheckInOut.css'; 
 
-const CheckInOut = ({ onLogout }) => {
+const CheckInOut = ({ onLogout, username, password }) => {
   const [hwSet1, setHwSet1] = useState({ capacity: '', available: '', request: '' });
   const [hwSet2, setHwSet2] = useState({ capacity: '', available: '', request: '' });
 
   const handleCheckIn = () => {
-    // Handle check-in logic here when its added
-    console.log('Checked In:', hwSet1, hwSet2);
+    console.log('Checked In:', hwSet1, hwSet2, 'User:', username, 'Password:', password);
+    // Handle check-in logic here when it's added
   };
 
   const handleCheckOut = () => {
-    // Handle check-out logic here when its added
-    console.log('Checked Out:', hwSet1, hwSet2);
+    console.log('Checked Out:', hwSet1, hwSet2, 'User:', username, 'Password:', password);
+    // Handle check-out logic here when it's added
   };
-
-  
 
   return (
     <div className="check-in-out-container">
+      <h1>{username}</h1>
       <h1>Check Out/In</h1>
       <div className="hardware-set">
         <div className="row">

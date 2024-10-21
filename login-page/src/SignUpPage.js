@@ -1,20 +1,39 @@
-// src/LoginPage.js
+// src/SignUpPage.js
 import React, { useState } from "react";
-import "./LoginPage.css";
+import "./SignUpPage.css";
 
-const LoginPage = ({ onLogin, message, onSignUp }) => {
+const SignUpPage = ({ onSignUp, message, onLoginRedirect }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = () => {
-    onLogin(username, password); // Send both credentials to App.js
+  const sendInfo = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+
+        onSignUp(username, password); // Call onSignUp to log in 
+      } else {
+        alert(data.message); 
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
-    <div className="login-page">
+    <div className="signup-page">
       <div className="wavy-bg"></div>
-      <div className="login-box">
-        <h1 className="title">HELLO.</h1>
+      <div className="signup-box">
+        <h1 className="title">WELCOME</h1>
 
         <div className="dot-group">
           <span className="dot active"></span>
@@ -22,8 +41,8 @@ const LoginPage = ({ onLogin, message, onSignUp }) => {
           <span className="dot"></span>
         </div>
 
-        <div className="login-form">
-          <h2>Login.</h2>
+        <div className="signup-form">
+          <h2>Sign Up.</h2>
 
           {/* Username Input */}
           <div className="input-field">
@@ -48,19 +67,19 @@ const LoginPage = ({ onLogin, message, onSignUp }) => {
           </div>
 
           <div className="button-group">
-            <button className="new-button" onClick={onSignUp}>
-              New Here?
+            <button className="back-button" onClick={onLoginRedirect}>
+              Have Account?
             </button>
-            <button className="continue-button" onClick={handleSubmit}>
-              Log In
+            <button className="signup-button" onClick={sendInfo}>
+              Sign Up
             </button>
           </div>
         </div>
-        
-        <p className="login-message">{message}</p>
+
+        <p className="signup-message">{message}</p>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

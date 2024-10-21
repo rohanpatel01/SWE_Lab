@@ -10,23 +10,23 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #cce6ff; /* Background color similar to the blue shade in your image */
+    background-color: #cce6ff; 
     position: relative;
   }
   
   .login-box {
-    background-color: #d6eaff; /* Light blue background for the form box */
+    background-color: #d6eaff; 
     padding: 40px;
     border-radius: 25px;
     width: 350px;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
     position: relative;
   }
   
   .title {
     font-size: 2.5rem;
-    color: #003d66; /* Darker blue for text */
+    color: #003d66; 
     margin-bottom: 30px;
   }
   
@@ -54,14 +54,14 @@ body {
     margin-top: 5px;
     border: 1px solid #cce6ff;
     border-radius: 10px;
-    background-color: #f0f8ff; /* Light blue input field */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Soft shadow on input fields */
+    background-color: #f0f8ff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
     color: #003d66;
     font-size: 1rem;
   }
   
   .input-field input::placeholder {
-    color: #99bbff; /* Placeholder color similar to the image */
+    color: #99bbff; 
   }
   
   .button-group {
@@ -71,7 +71,7 @@ body {
   }
   
   .new-button, .continue-button {
-    background-color: #99ccff; /* Soft blue buttons */
+    background-color: #99ccff; 
     color: white;
     padding: 10px 30px;
     border: none;
@@ -82,7 +82,7 @@ body {
   }
   
   .new-button:hover, .continue-button:hover {
-    background-color: #4d94ff; /* Darker blue on hover */
+    background-color: #4d94ff; 
   }
   
   .new-button {
@@ -93,7 +93,6 @@ body {
     background-color: #99ccff;
   }
   
-  /* Dots for design (like in the image) */
   .dot-group {
     display: flex;
     justify-content: center;
@@ -110,10 +109,9 @@ body {
   }
   
   .dot.active {
-    background-color: #4d94ff; /* Darker blue for active dot */
+    background-color: #4d94ff; 
   }
   
-  /* Adding wavy background shapes */
   .wavy-bg {
     position: absolute;
     top: 0;
@@ -121,9 +119,9 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-image: url('blob.png'); /* You can add SVG or image path here */
+    background-image: url('blob.png'); 
     background-size: cover;
     background-position: center;
-    opacity: 0.2; /* Lower opacity to make it subtle */
+    opacity: 0.2; 
   }
   
