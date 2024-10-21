@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import "./LoginPage.css"; // This is where we import the CSS
 
 const LoginPage = () => {
@@ -74,8 +75,10 @@ const LoginPage = () => {
           </form>
         </div>
       </div>
+
     </div>
   );
-};
+}
 
-export default LoginPage;
+export default App;
+
