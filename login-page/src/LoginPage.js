@@ -7,7 +7,7 @@ const LoginPage = ({ onLogin, message, onSignUp }) => {
   const [password, setPassword] = useState("");
 
   const handleSubmit = () => {
-    onLogin(username, password); // Send both credentials to App.js
+    onLogin(username, password); // Send both to App.js
   };
 
   return (

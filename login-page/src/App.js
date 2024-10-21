@@ -9,7 +9,6 @@ function App() {
   const [message, setMessage] = useState("");
   const [isSignUp, setIsSignUp] = useState(false); // Track if on Sign Up page
 
-  // Handle login with username and password
   const handleLogin = async (username, password) => {
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
@@ -25,7 +24,7 @@ function App() {
       if (response.ok) {
         setIsLoggedIn(true); // Successful login
       } else {
-        setMessage(data.message); // Display error message
+        setMessage(data.message); 
       }
     } catch (error) {
       setMessage("An error occurred. Please try again.");
@@ -37,10 +36,8 @@ function App() {
   };
 
   const handleSignUp = (username, password) => {
-    // Handle sign-up logic here
     console.log("Sign Up:", username, password);
-    // Optionally, add logic to send this info to the backend
-    setIsSignUp(false); // Return to login after sign-up
+    setIsSignUp(false); 
   };
 
   return (
@@ -53,7 +50,7 @@ function App() {
         <LoginPage
           onLogin={handleLogin}
           message={message}
-          onSignUp={() => setIsSignUp(true)} // Show sign-up page
+          onSignUp={() => setIsSignUp(true)} 
         />
       )}
     </div>
