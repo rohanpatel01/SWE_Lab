@@ -13,16 +13,16 @@ CORS(app)  # Enable CORS for all routes
 #     else:
 #         return render_template("index.html")
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_react(path):
-    print(f"Path requested: {path}")
-    # Check if the path exists in the build folder (static assets like JS, CSS, images)
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        # Serve index.html for all unknown paths (this is where React takes over)
-        return send_from_directory(app.static_folder, 'index.html')
+# @app.route('/', defaults={'path': ''})
+# @app.route('/<path:path>')
+# def serve_react(path):
+#     print(f"Path requested: {path}")
+#     # Check if the path exists in the build folder (static assets like JS, CSS, images)
+#     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+#         return send_from_directory(app.static_folder, path)
+#     else:
+#         # Serve index.html for all unknown paths (this is where React takes over)
+#         return send_from_directory(app.static_folder, 'index.html')
 
 # Route to handle credentials submission
 @app.route('/submit_credentials', methods=['POST'])
