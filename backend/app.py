@@ -4,14 +4,6 @@ from flask_cors import CORS  # Import CORS here
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Render the main page
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        return redirect("/")
-    else:
-        return render_template("index.html")
-
 # Route to handle credentials submission
 @app.route('/submit_credentials', methods=['POST'])
 def submit_credentials():
