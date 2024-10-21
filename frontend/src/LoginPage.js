@@ -3,6 +3,37 @@ import React from "react";
 import "./LoginPage.css"; // Import the corresponding CSS for this component
 
 const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
+
+  //TODO: use the below hooks to capture username and password data
+  const [username, setUsername] = React.useState('userPlaceholder'); // Track username input
+  const [password, setPassword] = React.useState('passPlaceholder'); // Track password input
+
+  const submitCredentials = async (event) => {
+    event.preventDefault(); // Prevent the page from refreshing
+    
+    try {
+      const response = await fetch('/submit_credentials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      console.log('Response from Flask:', data.message);
+
+    } catch (error) {
+      console.error('Error submitting credentials:', error);
+    }
+  };
+
+  // Tie together sending data and bool to change login state. TEMP/BANDAID for integration purposes
+  const handleButtonClick = async (event) => {
+    await submitCredentials(event); 
+    onLogin();                 
+  };
+
     return (
       <div className="login-page">
         <div className="wavy-bg"></div>
@@ -27,7 +58,7 @@ const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
             </div>
             <div className="button-group">
               <button className="new-button">New Here?</button>
-              <button className="continue-button" onClick={onLogin}>Continue</button>
+              <button className="continue-button" onClick={handleButtonClick}>Continue</button>
             </div>
           </div>
         </div>
