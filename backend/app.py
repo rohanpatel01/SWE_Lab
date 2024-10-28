@@ -5,8 +5,7 @@ from pymongo.server_api import ServerApi
 import os
 
 # MongoDB connection setup
-uri = "mongodb+srv://member:memberPass@cluster0.ccbhc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-client = MongoClient(uri, server_api=ServerApi('1'))
+client = MongoClient(os.getenv("MONGODB_URI"), server_api=ServerApi('1'))
 
 # Connect to the MongoDB database and collection
 db = client['SWELAB']
@@ -15,33 +14,15 @@ collection = db['Users']
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
-# Render the main page
-@app.route('/', defaults={'path': ''})
+
+@app.route('/')
+def serve_react_app():
+    return send_from_directory(app.static_folder, 'index.html')
+
+# Serve static files
 @app.route('/<path:path>')
-def index(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
-
-# Render the main page
-# @app.route("/", methods=["GET", "POST"])
-# def index():
-#     if request.method == "POST":
-#         return redirect("/")
-#     else:
-#         return render_template("index.html")
-
-# @app.route('/', defaults={'path': ''})
-# @app.route('/<path:path>')
-# def serve_react(path):
-#     print(f"Path requested: {path}")
-#     # Check if the path exists in the build folder (static assets like JS, CSS, images)
-#     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-#         return send_from_directory(app.static_folder, path)
-#     else:
-#         # Serve index.html for all unknown paths (this is where React takes over)
-#         return send_from_directory(app.static_folder, 'index.html')
+def static_files(path):
+    return send_from_directory(app.static_url_path, path)
 
 
 # Route to handle credentials submission
@@ -51,7 +32,9 @@ def submit_credentials():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    
+    print("collections:", db.list_collection_names)
+    print(username, password)
+
     # Insert the credentials into the MongoDB collection
     try:
         collection.insert_one({'username': username, 'password': password})
