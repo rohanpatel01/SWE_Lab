@@ -6,60 +6,46 @@ const LoginPage = ({ onLogin, message, onSignUp }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = () => {
-    onLogin(username, password); // Send both to App.js
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onLogin(username, password);
   };
 
   return (
     <div className="login-page">
-      <div className="wavy-bg"></div>
       <div className="login-box">
-        <h1 className="title">HELLO.</h1>
-
-        <div className="dot-group">
-          <span className="dot active"></span>
-          <span className="dot"></span>
-          <span className="dot"></span>
-        </div>
-
-        <div className="login-form">
-          <h2>Login.</h2>
-
-          {/* Username Input */}
+        <h2 className="title">Login</h2>
+        <form onSubmit={handleSubmit}>
           <div className="input-field">
-            <label>Username</label>
+            <label htmlFor="username">Username</label>
             <input
               type="text"
-              placeholder="Type here"
+              id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              required
             />
           </div>
-
-          {/* Password Input */}
           <div className="input-field">
-            <label>Password</label>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
-              placeholder="Type here"
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
             />
           </div>
-
           <div className="button-group">
-            <button className="new-button" onClick={onSignUp}>
-              New Here?
-            </button>
-            <button className="continue-button" onClick={handleSubmit}>
-              Log In
-            </button>
+            <button type="button" className="action-button" onClick={onSignUp}>Sign Up</button>
+            <button type="submit" className="action-button">Login</button>
           </div>
-        </div>
-
-        {/* Display Login Message */}
-        <p className="login-message">{message}</p>
+        </form>
+        {message && <p className="message">{message}</p>}
       </div>
+      <div className="wavy-bg"></div>
     </div>
   );
 };
