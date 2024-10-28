@@ -12,16 +12,17 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client['SWELAB']
 collection = db['Users']
 
-app = Flask(__name__, static_folder='../fronend/build/static', static_url_path='/')
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
 # Render the main page
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        return redirect("/")
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
     else:
-        return render_template("index.html")
+        return send_from_directory(app.static_folder, 'index.html')
 
 # Render the main page
 # @app.route("/", methods=["GET", "POST"])
