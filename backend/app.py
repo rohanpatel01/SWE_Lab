@@ -15,10 +15,14 @@ app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
 
-# Don't serve files from flask
 @app.route('/')
-def home():
-    return jsonify(message="Flask api is running"), 200
+def serve_react_app():
+    return send_from_directory(app.static_folder, 'index.html')
+
+# Serve static files
+@app.route('/<path:path>')
+def static_files(path):
+    return send_from_directory(app.static_url_path, path)
 
 
 # Route to handle credentials submission
