@@ -12,7 +12,7 @@ const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
     event.preventDefault(); // Prevent the page from refreshing
     
     try {
-      const response = await fetch('/submit_credentials', {
+      const response = await fetch('${process.env.REACT_APP_API_URL}/submit_credentials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
