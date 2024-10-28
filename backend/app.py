@@ -32,7 +32,7 @@ def submit_credentials():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    
+    print("test:", username, password)
     # Insert the credentials into the MongoDB collection
     try:
         collection.insert_one({'username': username, 'password': password})
