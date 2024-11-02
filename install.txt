@@ -1,5 +1,6 @@
 In backend folder
 pip install flask flask-cors
+pip install pymongo
 
 run the server in the backend folder:
 python app.py
