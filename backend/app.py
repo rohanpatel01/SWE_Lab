@@ -50,6 +50,10 @@ def sign_up():
     username = data.get('username')
     password = data.get('password')
 
+    # Check if username or password is empty
+    if not username or not password:
+        return jsonify({'status': 'error', 'message': 'Username and password cannot be empty'})
+
     if users_collection.find_one({'username': username}):
         return jsonify({'status': 'error', 'message': 'Username already exists'})
     
@@ -72,3 +76,5 @@ def sign_in():
 
 if __name__ == '__main__':
     app.run(host='localhost', debug=True)
+
+
