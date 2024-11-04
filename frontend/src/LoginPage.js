@@ -1,70 +1,95 @@
 // src/LoginPage.js
-import React from "react";
-import "./LoginPage.css"; // Import the corresponding CSS for this component
+import React, { useState } from "react";
+import "./LoginPage.css";
 
-const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
-
-  //TODO: use the below hooks to capture username and password data
-  const [username, setUsername] = React.useState(''); // Track username input
-  const [password, setPassword] = React.useState(''); // Track password input
+const LoginPage = ({ onLogin }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const submitCredentials = async (event) => {
-    event.preventDefault(); // Prevent the page from refreshing
-    
+    event.preventDefault();
+
+    const endpoint = isSignUp ? "sign_up" : "sign_in";
+    const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+
     try {
-      const response = await fetch('${process.env.REACT_APP_API_URL}/submit_credentials', {
-        method: 'POST',
+      const response = await fetch(`${baseUrl}/${endpoint}`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
-      console.log('Response from Flask:', data.message);
+      console.log("Response from Flask:", data.message);
 
+      if (data.status === "success") {
+        if (isSignUp) {
+          alert("Sign-up successful! You can now log in.");
+          setIsSignUp(false);  // Switch back to login mode
+        } else {
+          onLogin();  // Change app state to logged in
+        }
+      } else {
+        alert(data.message);  // Display error if sign-in/sign-up fails
+      }
+      
+      // Clear the input fields
+      setUsername("");
+      setPassword("");
+      
     } catch (error) {
-      console.error('Error submitting credentials:', error);
+      console.error("Error submitting credentials:", error);
+      alert("There was an error. Please try again.");
+      
+      // Clear the input fields
+      setUsername("");
+      setPassword("");
     }
   };
 
-  // Tie together sending data and bool to change login state. TEMP/BANDAID for integration purposes
-  const handleButtonClick = async (event) => {
-    await submitCredentials(event); 
-    onLogin();                 
-  };
-
-    return (
-      <div className="login-page">
-        <div className="wavy-bg"></div>
-        <div className="login-box">
-          <h1 className="title">HELLO.</h1>
-          
-          <div className="dot-group">
-            <span className="dot active"></span>
-            <span className="dot"></span>
-            <span className="dot"></span>
+  return (
+    <div className="login-page">
+      <div className="wavy-bg"></div>
+      <div className="login-box">
+        <h1 className="title">{isSignUp ? "Sign Up" : "Login"}</h1>
+        
+        <div className="login-form">
+          <div className="input-field">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Type here"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
           </div>
-  
-          <div className="login-form">
-            <h2>Login.</h2>
-            <div className="input-field">
-              <label>Username</label>
-              <input type="text" placeholder="Type here" value={username} onChange={(e) => setUsername(e.target.value)}/>
-            </div>
-            <div className="input-field">
-              <label>Password</label>
-              <input type="password" placeholder="Type here" value={password} onChange={(e) => setPassword(e.target.value)}/>
-            </div>
-            <div className="button-group">
-              <button className="new-button">New Here?</button>
-              <button className="continue-button" onClick={handleButtonClick}>Continue</button>
-            </div>
+          <div className="input-field">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Type here"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="button-group">
+            <button
+              className="new-button"
+              onClick={() => setIsSignUp((prev) => !prev)}
+            >
+              {isSignUp ? "Already have an account?" : "New Here?"}
+            </button>
+            <button className="continue-button" onClick={submitCredentials}>
+              Continue
+            </button>
           </div>
         </div>
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
 
 export default LoginPage;

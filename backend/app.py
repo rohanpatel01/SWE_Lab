@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template, request, jsonify, send_from_directory
-from flask_cors import CORS  # Import CORS here
+from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
@@ -8,59 +8,67 @@ import os
 uri = "mongodb+srv://member:memberPass@cluster0.ccbhc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-# Connect to the MongoDB database and collection
+# Connect to the MongoDB database and collections
 db = client['SWELAB']
-collection = db['Users']
+users_collection = db['Users']
+projects_collection = db['Projects']
 
-app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
+app = Flask(__name__, static_folder='../frontend/build/static', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
-# Render the main page
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def index(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
+# Constants for encryption
+N = 4  # Constant value for shifting characters
+D = 1  # Direction multiplier
 
-# Render the main page
-# @app.route("/", methods=["GET", "POST"])
-# def index():
-#     if request.method == "POST":
-#         return redirect("/")
-#     else:
-#         return render_template("index.html")
+# Encryption function for password hashing
+def encrypt(inputText, N, D):
+    revText = inputText[::-1]  # Reverse
 
-# @app.route('/', defaults={'path': ''})
-# @app.route('/<path:path>')
-# def serve_react(path):
-#     print(f"Path requested: {path}")
-#     # Check if the path exists in the build folder (static assets like JS, CSS, images)
-#     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-#         return send_from_directory(app.static_folder, path)
-#     else:
-#         # Serve index.html for all unknown paths (this is where React takes over)
-#         return send_from_directory(app.static_folder, 'index.html')
+    encryptedText = ""
+    for char in revText:
+        ascii_value = ord(char)
 
+        if ascii_value not in (32, 33):  # " " or "!"
+            # Shift the character by N positions in the direction D
+            new_ascii = ascii_value + (N * D)
 
-# Route to handle credentials submission
-@app.route('/submit_credentials', methods=['POST'])
-def submit_credentials():
-    # Get the JSON data sent from React
+            # Ensure the new ASCII is ok(34 to 126)
+            if new_ascii > 126:
+                new_ascii = 34 + (new_ascii - 127)
+            elif new_ascii < 34:
+                new_ascii = 126 - (33 - new_ascii)
+
+            encryptedText += chr(new_ascii)
+        else:
+            encryptedText += char
+
+    return encryptedText
+
+@app.route('/sign_up', methods=['POST'])
+def sign_up():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+
+    if users_collection.find_one({'username': username}):
+        return jsonify({'status': 'error', 'message': 'Username already exists'})
     
-    # Insert the credentials into the MongoDB collection
-    try:
-        collection.insert_one({'username': username, 'password': password})
-        # Respond back to the frontend
-        return jsonify({'status': 'success', 'message': 'Credentials saved to MongoDB'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+    encrypted_password = encrypt(password, N, D)
+    users_collection.insert_one({'username': username, 'password': encrypted_password})
+    return jsonify({'status': 'success', 'message': 'User signed up successfully'})
+
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    encrypted_password = encrypt(password, N, D)
+    user = users_collection.find_one({'username': username, 'password': encrypted_password})
+    if user:
+        return jsonify({'status': 'success', 'message': 'Signed in successfully'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Incorrect username or password'})
 
 if __name__ == '__main__':
     app.run(host='localhost', debug=True)
-
-client.close()
