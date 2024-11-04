@@ -18,7 +18,7 @@ db = client['SWELAB']
 users_collection = db['Users']
 projects_collection = db['Projects']
 
-app = Flask(__name__, static_folder='../frontend/build/static', static_url_path='/')
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
 @app.route('/')
