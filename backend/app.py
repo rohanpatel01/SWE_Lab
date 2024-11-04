@@ -14,8 +14,7 @@ client = MongoClient(os.getenv("MONGODB_URI"), server_api=ServerApi('1'))
 # Connect to the MongoDB database and collection
 db = client['SWELAB']
 collection = db['Users']
-print(os.getenv("MONGODB_URI"))
-print(collection.find_one())
+projects = db['Projects']
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
@@ -38,7 +37,6 @@ def submit_credentials():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    print("collections:", db.list_collection_names)
     print(username, password)
 
     # Insert the credentials into the MongoDB collection
@@ -50,24 +48,87 @@ def submit_credentials():
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
-# Route to handle user creation
-@app.route('/create_user', methods=['POST'])
-def create_user():
-    # Get the JSON data sent from React
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
+
+# TODO: Connect with front end. Convert to POST
+@app.route('/create_project/<projectid>', methods=['GET', 'POST'])
+def create_project(projectid):
+    # projectid = int(request.get_json().get('projectid'))
+
+    project_already_exists = check_project_exists(projectid)
+
+    if project_already_exists:
+        return jsonify({'message': "Can't add project. Project id already in use"})
+    else:
+        project_doc = {'ID': projectid, 'HW1Units': 0, 'HW2Units': 0, 'Authorized_Users': [], 'Users': []}
+        projects.insert_one(project_doc)
+        return jsonify({'message': 'Project created'})
+
+
+# TODO: Connect with front end. Convert to POST
+@app.route('/join_project/<user>/<projectid>', methods=['GET', 'POST'])
+def join_project(user, projectid):
+    # data = request.get_json()
+    # user = data.get('username')
+    # projectid = data.get('projectid')
+    projectid = int(projectid)
+    project = get_project(projectid)
+    if check_user_authorized(user, project) and not check_user_in_project(user, project):
+        # logic to add user to project and/or project to the user
+        filter_query = {'ID': projectid}
+        join_query = {'$push': {'Users': user}}
+        projects.update_one(filter_query, join_query)
+        return jsonify({'message': "user added"})
+    else:
+        # logic telling frontend that user is not authorized
+        return jsonify({'message': 'user already in project or not authorized'})
     
-    #TODO: Encrypt pass word and then query database for existing user.
-    #TODO: If no existing user from database send write instruction to database and success to react.
-    #TODO: If existing user, do not write to database and return existing user message
 
-    return
+# TODO: Connect with front end. Convert to POST
+@app.route('/leave_project/<user>/<projectid>', methods=['GET', 'POST'])
+def leave_project(user, projectid):
+    # data = request.get_json()
+    # username = data.get('username')
+    # projectid = data.get('projectid')
+    projectid = int(projectid)
+    project = get_project(projectid)
+    print(project)
+    # Check if user is in project
+    if not check_user_in_project(user, project):
+        return jsonify({'message': 'User already not in project'})
+    else:
+        filter_query = {'ID': projectid}
+        leave_query = {'$pull': {'Users': user}}
+        projects.update_one(filter_query, leave_query)
+        return jsonify({'message': f'{user} removed from project {projectid}'})
 
-# Encrypt password before querying or storing in database
-def encrypt_password(password:str) -> str:
-    #TODO: Complete with hashing or some encryption method
-    pass
+
+def get_project(projectid):
+    return projects.find_one({'ID': int(projectid)})
+
+def check_project_exists(projectid):
+    project = projects.find_one({'ID': projectid})
+    if project:
+        return True
+    return False
+
+def check_user_in_project(user: str, project) -> bool:
+    if not project:
+        print("no project with id found")
+        return False
+    if user in project["Users"]:
+        return True
+    else:
+        return False
+
+# Checks if users is authorized to join a project
+def check_user_authorized(user: str, project) -> bool:
+    if not project:
+        print("no project with id found")
+        return False
+    if user in project["Authorized_Users"]:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
