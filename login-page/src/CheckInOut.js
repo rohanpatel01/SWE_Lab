@@ -2,19 +2,82 @@
 import React, { useState } from 'react';
 import './CheckInOut.css'; 
 
+
 const CheckInOut = ({ onLogout, username, password }) => {
   const [hwSet1, setHwSet1] = useState({ capacity: '', available: '', request: '' });
   const [hwSet2, setHwSet2] = useState({ capacity: '', available: '', request: '' });
 
-  const handleCheckIn = () => {
-    console.log('Checked In:', hwSet1, hwSet2, 'User:', username, 'Password:', password);
-    // Handle check-in logic here when it's added
-  };
+const [defaultProjectID, setDefaultProjectID] = useState(1);
 
-  const handleCheckOut = () => {
-    console.log('Checked Out:', hwSet1, hwSet2, 'User:', username, 'Password:', password);
-    // Handle check-out logic here when it's added
-  };
+const connectToClient = () => {
+  console.log("attempt connection to mongoDB client")
+}
+
+const handleCheckOut = async () => {
+  // connectToClient()
+  console.log("Amoutn to check in: " + hwSet1.request)
+
+  // Make query to python flask back end and console.log the availability we have for a given hardware set
+  try {
+    const response = await fetch("http://127.0.0.1:5000/CheckOut", { // 
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(
+        {
+          projectID : defaultProjectID, 
+          HW_Set_1_Request : hwSet1.request,
+          HW_Set_2_Request : hwSet2.request
+        }),
+    });
+
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log("Printing Data: " + data)
+    } else {
+      console.log("Error: Bad JSON response");
+    }
+
+
+  } catch (error) {
+    console.log("Error")
+    // setMessage("An error occurred. Please try again.");
+  }
+};
+
+const handleCheckIn = async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:5000/CheckIn", { // 
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(
+        {
+          projectID : defaultProjectID, 
+          HW_Set_1_Request : hwSet1.request,
+          HW_Set_2_Request : hwSet2.request
+        }),
+    });
+
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log("Printing Data: " + data)
+    } else {
+      console.log("Error: Bad JSON response");
+    }
+
+
+  } catch (error) {
+    console.log("Error: " + error)
+    // setMessage("An error occurred. Please try again.");
+  }
+};
 
   return (
     <div className="check-in-out-container">
