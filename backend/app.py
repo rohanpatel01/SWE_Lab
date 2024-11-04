@@ -169,5 +169,3 @@ def check_user_authorized(user: str, project) -> bool:
 
 if __name__ == '__main__':
     app.run(host='localhost', debug=True)
-
-client.close()
