@@ -17,20 +17,21 @@ const handleCheckOut = async () => {
   // connectToClient()
   console.log("Amoutn to check in: " + hwSet1.request)
 
+  const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+
   // Make query to python flask back end and console.log the availability we have for a given hardware set
   try {
-    const response = await fetch("http://127.0.0.1:5000/CheckOut", { // 
+    const response = await fetch(`${baseUrl}/CheckOut`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(
-        {
-          projectID : defaultProjectID, 
-          HW_Set_1_Request : hwSet1.request,
-          HW_Set_2_Request : hwSet2.request
-        }),
+      body: JSON.stringify({
+        projectID: defaultProjectID,
+        HW_Set_1_Request: hwSet1.request,
+        HW_Set_2_Request: hwSet2.request
+      }),
     });
 
 
@@ -49,19 +50,21 @@ const handleCheckOut = async () => {
 };
 
 const handleCheckIn = async () => {
+
+  const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+  
   try {
-    const response = await fetch("http://127.0.0.1:5000/CheckIn", { // 
+    const response = await fetch(`${baseUrl}/CheckIn`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(
-        {
-          projectID : defaultProjectID, 
-          HW_Set_1_Request : hwSet1.request,
-          HW_Set_2_Request : hwSet2.request
-        }),
+      body: JSON.stringify({
+        projectID: defaultProjectID,
+        HW_Set_1_Request: hwSet1.request,
+        HW_Set_2_Request: hwSet2.request
+      }),
     });
 
 
