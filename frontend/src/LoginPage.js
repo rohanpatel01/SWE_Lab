@@ -29,8 +29,29 @@ const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
     }
   };
 
+  const createUser = async (event) => {
+    event.preventDefault();
+
+    try {
+      const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+      const response = await fetch(`${baseUrl}/create_user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      console.log('Response from Flask:', data.message);
+
+    } catch (error) {
+      console.error('Error submitting credentials:', error);
+    }
+  }
+
   // Tie together sending data and bool to change login state. TEMP/BANDAID for integration purposes
-  const handleButtonClick = async (event) => {
+  const handleLogin = async (event) => {
     await submitCredentials(event); 
     onLogin();                 
   };
@@ -58,8 +79,8 @@ const LoginPage = ({ onLogin }) => {  // Accept the onLogin function as a prop
               <input type="password" placeholder="Type here" value={password} onChange={(e) => setPassword(e.target.value)}/>
             </div>
             <div className="button-group">
-              <button className="new-button">New Here?</button>
-              <button className="continue-button" onClick={handleButtonClick}>Continue</button>
+              <button className="new-button" onClick={handleNewUser}>New Here?</button>
+              <button className="continue-button" onClick={handleLogin}>Continue</button>
             </div>
           </div>
         </div>

@@ -3,13 +3,19 @@ from flask_cors import CORS  # Import CORS here
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
+from dotenv import load_dotenv
+
+# Conditionally load .env file if not in production
+if os.getenv("ENV") != "production":
+    load_dotenv()
 
 # MongoDB connection setup
 client = MongoClient(os.getenv("MONGODB_URI"), server_api=ServerApi('1'))
-
 # Connect to the MongoDB database and collection
 db = client['SWELAB']
 collection = db['Users']
+print(os.getenv("MONGODB_URI"))
+print(collection.find_one())
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
@@ -41,6 +47,7 @@ def submit_credentials():
         # Respond back to the frontend
         return jsonify({'status': 'success', 'message': 'Credentials saved to MongoDB'})
     except Exception as e:
+        print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
 # Route to handle user creation
