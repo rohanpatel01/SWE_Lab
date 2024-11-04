@@ -87,7 +87,7 @@ def create_project(projectid):
         return jsonify({'message': "Can't add project. Project id already in use"})
     else:
         project_doc = {'ID': projectid, 'HW1Units': 0, 'HW2Units': 0, 'Authorized_Users': [], 'Users': []}
-        projects.insert_one(project_doc)
+        projects_collection.insert_one(project_doc)
         return jsonify({'message': 'Project created'})
 
 
@@ -103,7 +103,7 @@ def join_project(user, projectid):
         # logic to add user to project and/or project to the user
         filter_query = {'ID': projectid}
         join_query = {'$push': {'Users': user}}
-        projects.update_one(filter_query, join_query)
+        projects_collection.update_one(filter_query, join_query)
         return jsonify({'message': "user added"})
     else:
         # logic telling frontend that user is not authorized
