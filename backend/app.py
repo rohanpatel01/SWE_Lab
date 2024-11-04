@@ -21,6 +21,15 @@ projects_collection = db['Projects']
 app = Flask(__name__, static_folder='../frontend/build/static', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
+@app.route('/')
+def serve_react_app():
+    return send_from_directory(app.static_folder, 'index.html')
+
+# Serve static files
+@app.route('/<path:path>')
+def static_files(path):
+    return send_from_directory(app.static_url_path, path)
+
 # Constants for encryption
 N = 4  # Constant value for shifting characters
 D = 1  # Direction multiplier
