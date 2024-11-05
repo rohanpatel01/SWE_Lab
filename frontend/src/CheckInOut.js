@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './CheckInOut.css'; 
 
 
-const CheckInOut = ({ onLogout, username, password }) => {
+const CheckInOut = ({ onBack, username, password }) => {
   const [hwSet1, setHwSet1] = useState({ capacity: '', available: '', request: '' });
   const [hwSet2, setHwSet2] = useState({ capacity: '', available: '', request: '' });
 
@@ -133,7 +133,7 @@ const handleCheckIn = async () => {
       <div className="button-group">
         <button onClick={handleCheckIn}>Check In</button>
         <button onClick={handleCheckOut}>Check Out</button>
-        <button className="logout-button" onClick={onLogout}>Log Out</button>
+        <button className="button" onClick={onBack}>Back</button>
       </div>
     </div>
   );

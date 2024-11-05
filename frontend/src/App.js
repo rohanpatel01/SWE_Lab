@@ -1,25 +1,31 @@
 import React, { useState } from "react";
-import LoginPage from "./LoginPage"; // Import the LoginPage component
-import CheckInOut from "./CheckInOut"; // Import the CheckInOut component
+import LoginPage from "./LoginPage";
+import ProjectForm from "./ProjectForm";
+import CheckInOut from "./CheckInOut";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const [page, setPage] = useState("login");
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    setPage("projectForm");
   };
 
-
-  const handleLogout = () => {
-    setIsLoggedIn(false); 
+  const handleNavigation = (destination) => {
+    setPage(destination);
   };
 
   return (
     <div>
-      {isLoggedIn ? (
-        <CheckInOut onLogout={handleLogout} /> 
-      ) : (
-        <LoginPage onLogin={handleLogin} />
+      {page === "login" && <LoginPage onLogin={handleLogin} />}
+      {page === "projectForm" && (
+        <ProjectForm 
+          onMake={() => handleNavigation("checkInOut")} 
+          onJoin={() => handleNavigation("checkInOut")} 
+          onLogout={() => handleNavigation("login")} 
+        />
+      )}
+      {page === "checkInOut" && (
+        <CheckInOut onBack={() => handleNavigation("projectForm")} />
       )}
     </div>
   );

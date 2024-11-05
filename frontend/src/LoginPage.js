@@ -77,12 +77,12 @@ const LoginPage = ({ onLogin }) => {
           </div>
           <div className="button-group">
             <button
-              className="new-button"
+              className="action-button"
               onClick={() => setIsSignUp((prev) => !prev)}
             >
               {isSignUp ? "Already have an account?" : "New Here?"}
             </button>
-            <button className="continue-button" onClick={submitCredentials}>
+            <button className="action-button" onClick={submitCredentials}>
               Continue
             </button>
           </div>
