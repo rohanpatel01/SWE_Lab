@@ -80,43 +80,71 @@ def sign_in():
         return jsonify({'status': 'error', 'message': 'Incorrect username or password'})
 
 
-# TODO: Connect with front end. Convert to POST
-@app.route('/create_project/<projectid>', methods=['GET', 'POST'])
-def create_project(projectid):
-    # projectid = int(request.get_json().get('projectid'))
+# TODO: Implement a unique project ID generator
+@app.route('/create_project', methods=['POST'])
+def create_project():
+    data = request.get_json()
+    
+     # Check if data is None or missing required fields
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+    
+    projectid = data.get('projectid')
+    projectName = data.get('projectName')
+    projectDescription = data.get('projectDescription')
+    projectAuthor = data.get('username')
 
+    if not projectid or not projectName or not projectDescription:
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+    
+    projectid = int(projectid)
     project_already_exists = check_project_exists(projectid)
 
     if project_already_exists:
-        return jsonify({'message': "Can't add project. Project id already in use"})
+        return jsonify({'status': 'error', 'message': "Can't add project. Project id already in use"})
     else:
-        project_doc = {'ID': projectid, 'HW1Units': 0, 'HW2Units': 0, 'Authorized_Users': [], 'Users': []}
+        project_doc = {'ID': projectid, 'Project_Name': projectName, 'Project_Description': projectDescription, 'HW1Units': 0, 'HW2Units': 0, 'Authorized_Users': [projectAuthor], 'Users': []}
         projects_collection.insert_one(project_doc)
-        return jsonify({'message': 'Project created'})
+        return jsonify({'status': 'success', 'message': 'Project created'})
 
 
-# TODO: Connect with front end. Convert to POST
-@app.route('/join_project/<user>/<projectid>', methods=['GET', 'POST'])
-def join_project(user, projectid):
-    # data = request.get_json()
-    # user = data.get('username')
-    # projectid = data.get('projectid')
+@app.route('/join_project', methods=['POST'])
+def join_project():
+    data = request.get_json()
+    
+    # Check if data is None or missing required fields
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+    
+    user = data.get('username')
+    projectid = data.get('joinid')
+
+    if not projectid or not user:
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
     projectid = int(projectid)
+    if not check_project_exists(projectid):
+        return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
+    
     project = get_project(projectid)
-    if check_user_authorized(user, project) and not check_user_in_project(user, project):
+
+    if check_user_in_project(user, project):
+        return jsonify({'status': 'error', 'message': 'User already in project'}), 400
+    
+    if check_user_authorized(user, project):
         # logic to add user to project and/or project to the user
         filter_query = {'ID': projectid}
         join_query = {'$push': {'Users': user}}
         projects_collection.update_one(filter_query, join_query)
-        return jsonify({'message': "user added"})
+        return jsonify({'status': 'success', 'message': "user added"})
     else:
         # logic telling frontend that user is not authorized
-        return jsonify({'message': 'user already in project or not authorized'})
+        return jsonify({'status': 'error', 'message': 'user not authorized'})
     
 
 # TODO: Connect with front end. Convert to POST
-@app.route('/leave_project/<user>/<projectid>', methods=['GET', 'POST'])
-def leave_project(user, projectid):
+@app.route('/leave_project', methods=['POST'])
+def leave_project():
     # data = request.get_json()
     # username = data.get('username')
     # projectid = data.get('projectid')

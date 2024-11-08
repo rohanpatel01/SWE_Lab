@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./LoginPage.css";
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = ({ onLogin, setUser}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -30,6 +30,7 @@ const LoginPage = ({ onLogin }) => {
           alert("Sign-up successful! You can now log in.");
           setIsSignUp(false);  // Switch back to login mode
         } else {
+          setUser(username);  // Save the logged-in user for the session
           onLogin();  // Change app state to logged in
         }
       } else {
