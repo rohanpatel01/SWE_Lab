@@ -15,7 +15,7 @@ const connectToClient = () => {
 
 const handleCheckOut = async () => {
   // connectToClient()
-  console.log("Amoutn to check in: " + hwSet1.request)
+  console.log("Amount to check in: " + hwSet1.request)
 
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
 
