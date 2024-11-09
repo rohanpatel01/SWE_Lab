@@ -83,11 +83,6 @@ def sign_up():
     username = data.get('username')
     password = data.get('password')
 
-    if not username or username.strip() == "":
-        return jsonify({'status': 'error', 'message': 'Invalid Username: Cannot be empty'})
-    if not password or password.strip() == "":
-        return jsonify({'status': 'error', 'message': 'Invalid Password: Cannot be empty'})
-
     if users_collection.find_one({'username': username}):
         return jsonify({'status': 'error', 'message': 'Username already exists'})
     
@@ -100,11 +95,6 @@ def sign_in():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-
-    if not username or username.strip() == "":
-        return jsonify({'status': 'error', 'message': 'Invalid Username: Cannot be empty'})
-    if not password or password.strip() == "":
-        return jsonify({'status': 'error', 'message': 'Invalid Password: Cannot be empty'})
 
     encrypted_password = encrypt(password, N, D)
     print("Username: ", username)
