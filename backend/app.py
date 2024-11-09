@@ -12,6 +12,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client['SWELAB']
 users_collection = db['Users']
 projects_collection = db['Projects']
+resources_collection = db['Resources']
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
@@ -53,6 +54,29 @@ def encrypt(inputText, N, D):
 
     return encryptedText
 
+@app.route('/fetchData', methods=['POST'])
+def fetch_data():
+    data = request.get_json()
+    projectID = data.get('projectID')
+    print("ProjectID recieved: ", projectID)
+
+    HW_Set_1 = resources_collection.find_one({'Name': "HW_Set_1"})
+    HW_Set_2 = resources_collection.find_one({'Name': "HW_Set_2"})
+
+    HwSet1_available = HW_Set_1.get('Availability')
+    HwSet1_capacity = HW_Set_1.get('Capacity')
+
+    HwSet2_available = HW_Set_2.get('Availability')
+    HwSet2_capacity = HW_Set_2.get('Capacity')
+
+    return jsonify({
+        'status': 'success', 'message': 'Fetch Data successful',
+        'HwSet1_available': HwSet1_available,
+        'HwSet1_capacity': HwSet1_capacity,
+        'HwSet2_available': HwSet2_available,
+        'HwSet2_capacity': HwSet2_capacity
+        })
+
 @app.route('/sign_up', methods=['POST'])
 def sign_up():
     data = request.get_json()
@@ -73,6 +97,8 @@ def sign_in():
     password = data.get('password')
 
     encrypted_password = encrypt(password, N, D)
+    print("Username: ", username)
+    print("Password", password)
     user = users_collection.find_one({'username': username, 'password': encrypted_password})
     if user:
         return jsonify({'status': 'success', 'message': 'Signed in successfully'})
