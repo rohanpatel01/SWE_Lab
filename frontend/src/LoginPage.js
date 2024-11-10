@@ -1,14 +1,11 @@
-// src/LoginPage.js
 import React, { useState } from "react";
-import ProjectForm from "./ProjectForm";
 import "./LoginPage.css";
 
-const LoginPage = ({ onLogin, setUser}) => {
+const LoginPage = ({ onLogin, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [authorizedProjects, setProjects] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authorizedProjects, setAuthorizedProjects] = useState([]);
 
   const submitCredentials = async (event) => {
     event.preventDefault();
@@ -33,63 +30,21 @@ const LoginPage = ({ onLogin, setUser}) => {
           alert("Sign-up successful! You can now log in.");
           setIsSignUp(false);  // Switch back to login mode
         } else {
-          setUser(username);  // Save the logged-in user for the session
-          setIsLoggedIn(true)
-          // onLogin();  // Change app state to logged in
-          // Fetch authorized projects after login
-          const endPoint1 = 'fetch_authorized_projects';
-          const projectsResponse = await fetch(`${baseUrl}/${endPoint1}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username }),
-          });
-          const projectsData = await projectsResponse.json();
-
-          if (projectsData.status === "success") {
-              console.log(authorizedProjects)
-              setProjects(projectsData.authorizedProjects);  // Save authorized projects
-          } else {
-              console.error("Error fetching authorized projects:", projectsData.message);
-              alert("Error fetching authorized projects.");
-          }
+          setUsername(username);  // Save the logged-in user for the session
+          setUser(username)
+          // setAuthorizedProjects(data.authorizedProjects);
+          onLogin(username);
         }
       } else {
         alert(data.message);  // Display error if sign-in/sign-up fails
       }
       
-      // Clear the input fields
-      // setUsername("");
-      // setPassword("");
-      
     } catch (error) {
       console.error("Error submitting credentials:", error);
       alert("There was an error. Please try again.");
-      
-      // Clear the input fields
-      // setUsername("");
-      // setPassword("");
+
     }
   };
-
-  if (isLoggedIn) {
-    // Render ProjectForm with authorizedProjects as a prop
-    return (
-      <ProjectForm
-        onMake={() => console.log("Project Created")}
-        onJoin={() => console.log("Project Joined")}
-        onLogout={() => {
-          setIsLoggedIn(false);
-          setUsername("");
-          setPassword("");
-        }}
-        username={username}
-        setUser={setUser}
-        authorizedProjects={authorizedProjects}
-      />
-    );
-  }
 
   return (
     

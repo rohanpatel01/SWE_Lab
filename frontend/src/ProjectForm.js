@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './ProjectForm.css';
 
 const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = []}) => {
@@ -9,6 +9,9 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
   const [joinid, setJoinid] = useState("");
   const [selectedProject, setSelectedProject] = useState("");
 
+  useEffect(() => {
+    console.log("Authorized Projects Updated:", authorizedProjects);
+  }, [authorizedProjects]);
 
   const handleMake = async (event) => {
     event.preventDefault();

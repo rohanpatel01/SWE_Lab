@@ -147,8 +147,8 @@ def create_project():
 @app.route('/fetch_authorized_projects', methods=['POST'])
 def fetch_authorized_projects():
     data = request.get_json()
-    username = str(data.get('username'))
-
+    username = str(data.get('user'))
+    print(username)
     if not username:
         return jsonify({'status': 'error', 'message': 'Username is required'}), 400
 
