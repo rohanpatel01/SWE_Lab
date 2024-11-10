@@ -220,11 +220,14 @@ def CheckOut():
     data = request.get_json()
 
     projectID = data.get('projectID')
-    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else -1
-    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else -1
+    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else 0
+    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else 0
 
     if hw1_request < 0 or hw2_request < 0:
-        return jsonify({"message": "Check out value cannot be negative"}), 400
+        return jsonify({"message": "Invalid request. Cannot request negative values."}), 400
+
+    if hw1_request == 0 and hw2_request == 0:
+        return jsonify({"message": "Invalid request. Make sure request values are postive integers."}), 400
 
     db = client['SWELAB']
     resources_collection = db['Resources']

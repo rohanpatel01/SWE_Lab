@@ -33,8 +33,22 @@ useEffect(() => {
         console.log("Error: Bad JSON response");
       }
 
-      setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity });
-      setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
+      console.log("Prev hwSet1 Request: ", hwSet1.request)
+
+      // setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity});
+      // setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
+
+      setHwSet1((prevHwSet1) => ({
+        ...prevHwSet1,
+        available: data.HwSet1_available,
+        capacity: data.HwSet1_capacity,
+      }));
+
+      setHwSet2((prevHwSet2) => ({
+        ...prevHwSet2,
+        available: data.HwSet2_available,
+        capacity: data.HwSet2_capacity,
+      }));
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -46,18 +60,12 @@ useEffect(() => {
 
 }, []); // Empty array means this only runs on mount
 
-
-// Function to fetch the capacity and availability of the hardware sets 
-// const fetchHardwareSetData = async () => {
-// }
-
 const handleCheckOut = async () => {
 
   console.log("Amount to check out: " + hwSet1.request)
 
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
 
-  // Make query to python flask back end and console.log the availability we have for a given hardware set
   try {
     const response = await fetch(`${baseUrl}/CheckOut`, {
       method: "POST",
@@ -167,8 +175,8 @@ const handleCheckIn = async () => {
           <input
             type="text"
             placeholder="Request"
-            value={hwSet2.request}
-            onChange={(e) => setHwSet2({ ...hwSet2, request: e.target.value })}
+            value={hwSet2.request} 
+            onChange={(e) => setHwSet2({ ...hwSet2, request: e.target.value })} 
           />
         </div>
       </div>
