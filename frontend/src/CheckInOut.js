@@ -8,53 +8,53 @@ const CheckInOut = ({ onBack, username, password }) => {
 
 const [defaultProjectID, setDefaultProjectID] = useState(1);
 
-useEffect(() => {
 
-  const fetchData = async () => {
+const fetchData = async () => {
 
-    const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+  const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
 
-    try {
-      const response = await fetch(`${baseUrl}/fetchData`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-          projectID: defaultProjectID
-        }),
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Printing Data: " + data)
-      } else {
-        console.log("Error: Bad JSON response");
-      }
+  try {
+    const response = await fetch(`${baseUrl}/fetchData`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        projectID: defaultProjectID
+      }),
+    });
 
-      console.log("Prev hwSet1 Request: ", hwSet1.request)
-
-      // setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity});
-      // setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
-
-      setHwSet1((prevHwSet1) => ({
-        ...prevHwSet1,
-        available: data.HwSet1_available,
-        capacity: data.HwSet1_capacity,
-      }));
-
-      setHwSet2((prevHwSet2) => ({
-        ...prevHwSet2,
-        available: data.HwSet2_available,
-        capacity: data.HwSet2_capacity,
-      }));
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    const data = await response.json();
+    if (response.ok) {
+      console.log("Printing Data: " + data)
+    } else {
+      console.log("Error: Bad JSON response");
     }
-  };
 
+    console.log("Prev hwSet1 Request: ", hwSet1.request)
+
+    // setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity});
+    // setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
+
+    setHwSet1((prevHwSet1) => ({
+      ...prevHwSet1,
+      available: data.HwSet1_available,
+      capacity: data.HwSet1_capacity,
+    }));
+
+    setHwSet2((prevHwSet2) => ({
+      ...prevHwSet2,
+      available: data.HwSet2_available,
+      capacity: data.HwSet2_capacity,
+    }));
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+useEffect(() => {
   const periodic_function_call = setInterval(fetchData, 3000);
   return () => clearInterval(periodic_function_call); // on unmount we want to clear this
 
@@ -74,7 +74,7 @@ const handleCheckOut = async () => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        projectID: 11,
+        projectID: defaultProjectID,
         HW_Set_1_Request: hwSet1.request,
         HW_Set_2_Request: hwSet2.request
       }),
@@ -85,9 +85,10 @@ const handleCheckOut = async () => {
     if (response.ok) {
       console.log("Printing Data: " + data)
     } else {
-      console.log("Error: Bad JSON response");
+      alert(data.message);
     }
 
+    fetchData()
 
   } catch (error) {
     console.log("Error")
@@ -118,8 +119,11 @@ const handleCheckIn = async () => {
     if (response.ok) {
       console.log("Printing Data: " + data)
     } else {
-      console.log("Error: Bad JSON response");
+      alert(data.message);
     }
+
+    fetchData()
+
 
 
   } catch (error) {

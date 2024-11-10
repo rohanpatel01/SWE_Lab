@@ -237,9 +237,10 @@ def CheckOut():
     project_availabiltiy_HW1 = project.get('HW1Units')
     project_availabiltiy_HW2 = project.get('HW2Units')
 
-
     hardWareSet1 = resources_collection.find_one({'Name': 'HW_Set_1'})
     hardWareSet2 = resources_collection.find_one({'Name': 'HW_Set_2'})
+
+    error = False
 
     # Perform Hardware Set 1 operations
     if hardWareSet1 and hw1_request:
@@ -249,6 +250,7 @@ def CheckOut():
         amount_projectID_to_checkout = 0
 
         if hw1_request > hw1_availability:
+            error = True
             amount_HW1_to_remove = hw1_availability
             amount_projectID_to_checkout = hw1_availability
         else:
@@ -265,11 +267,6 @@ def CheckOut():
             {'$set': {'HW1Units': project_availabiltiy_HW1 + amount_projectID_to_checkout }}     # Update operation
         )
 
-    else:
-        print("Hardware Set 1 check out could not be completed")
-
-
-
     # Perform Hardware Set 2 operations
     if hardWareSet2 and hw2_request:
         hw2_availability = int(hardWareSet2.get('Availability'))
@@ -278,6 +275,7 @@ def CheckOut():
         amount_projectID_to_checkout = 0
 
         if hw2_request > hw2_availability:
+            error = True
             amount_HW2_to_remove = hw2_availability
             amount_projectID_to_checkout = hw2_availability
         else:
@@ -294,11 +292,10 @@ def CheckOut():
             {'$set': {'HW2Units': project_availabiltiy_HW2 + amount_projectID_to_checkout }}   
         )
 
+    if error:
+        return jsonify({"message": "Error. Could not process entire check out value"}), 400
     else:
-        print("Hardware Set 2 check out could not be completed")
-
-        
-    return jsonify({"message": "Check Out Successful"}), 200
+        return jsonify({"message": "Check Out Successful"}), 200
 
 @app.route('/CheckIn', methods=['POST'])
 def CheckIn():
@@ -322,6 +319,8 @@ def CheckIn():
     hardWareSet1 = resources_collection.find_one({'Name': 'HW_Set_1'})
     hardWareSet2 = resources_collection.find_one({'Name': 'HW_Set_2'})
 
+    error = False
+
     # Perform Hardware Set 1 operations
     # Attempt to check in as many as possible
     if hardWareSet1 and hw1_request:
@@ -334,9 +333,12 @@ def CheckIn():
         if hw1_request + hw1_availability <= hw1_capacity:
             amount_HW1_to_add = hw1_request
             amount_projectID_to_checkin = hw1_request
+            print("correct")
         else:
+            error = True
             amount_HW1_to_add = hw1_capacity - hw1_availability
             amount_projectID_to_checkin = hw1_capacity - hw1_availability
+
 
         resources_collection.update_one(
             {'Name': "HW_Set_1"},
@@ -352,7 +354,6 @@ def CheckIn():
         print("Hardware Set 1 check in could not be completed")
 
 
-
     # Perform Hardware Set 2 operations
     if hardWareSet2 and hw2_request:
         hw2_availability = int(hardWareSet2.get('Availability'))
@@ -365,6 +366,7 @@ def CheckIn():
             amount_HW2_to_add = hw2_request
             amount_projectID_to_checkin = hw2_request
         else:
+            error = True
             amount_HW2_to_add = hw2_capacity - hw2_availability
             amount_projectID_to_checkin = hw2_capacity - hw2_availability
 
@@ -378,11 +380,10 @@ def CheckIn():
             {'$set': {'HW2Units': project_availabiltiy_HW2 - amount_projectID_to_checkin }}     
         )
 
+    if error:
+        return jsonify({"message": "Error. Could not process entire check in value"}), 400
     else:
-        print("Hardware Set 2 check in could not be completed")
-
-        
-    return jsonify({"message": "Check In Successful"}), 200
+        return jsonify({"message": "Check In Successful"}), 200
 
 
 
