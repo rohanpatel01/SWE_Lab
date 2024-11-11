@@ -125,11 +125,11 @@ def create_project():
      # Check if data is None or missing required fields
     if not data:
         return jsonify({'status': 'error', 'message': 'No data provided'}), 400
-    
+    print(data)
     projectid = data.get('projectid')
     projectName = data.get('projectName')
     projectDescription = data.get('projectDescription')
-    projectAuthor = data.get('username')
+    projectAuthor = str(data.get('username'))
 
     if not projectid or not projectName or not projectDescription:
         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
@@ -143,18 +143,45 @@ def create_project():
         project_doc = {'ID': projectid, 'Project_Name': projectName, 'Project_Description': projectDescription, 'HW1Units': 0, 'HW2Units': 0, 'Authorized_Users': [projectAuthor], 'Users': []}
         projects_collection.insert_one(project_doc)
         return jsonify({'status': 'success', 'message': 'Project created'})
+    
+@app.route('/fetch_authorized_projects', methods=['POST'])
+def fetch_authorized_projects():
+    data = request.get_json()
+    username = str(data.get('user'))
+    print(username)
+    if not username:
+        return jsonify({'status': 'error', 'message': 'Username is required'}), 400
 
+    try:
+        print("Username:", username)
+        username = str(username)  # Ensure it's a string
+        authorized_projects = list(projects_collection.find(
+            {"Authorized_Users": {"$in": [username]}},
+            {'_id': 1, 'ID': 1, 'Project_Name': 1}
+        ))
+
+        print("Authorized Projects:", authorized_projects)
+
+        # Convert ObjectIds to strings for JSON serialization
+        for project in authorized_projects:
+            project['_id'] = str(project['_id'])
+            # project['ID'] = str(project['ID'])
+
+        return jsonify({'status': 'success', 'authorizedProjects': authorized_projects})
+    except Exception as e:
+        print("Error finding authorized projects:", str(e))
+        return jsonify({'status': 'error', 'message': 'Issue finding projects'}), 500
 
 @app.route('/join_project', methods=['POST'])
 def join_project():
     data = request.get_json()
-    
+
     # Check if data is None or missing required fields
     if not data:
         return jsonify({'status': 'error', 'message': 'No data provided'}), 400
     
     user = data.get('username')
-    projectid = data.get('joinid')
+    projectid = data.get('projectid')
 
     if not projectid or not user:
         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
@@ -163,20 +190,7 @@ def join_project():
     if not check_project_exists(projectid):
         return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
     
-    project = get_project(projectid)
-
-    if check_user_in_project(user, project):
-        return jsonify({'status': 'error', 'message': 'User already in project'}), 400
-    
-    if check_user_authorized(user, project):
-        # logic to add user to project and/or project to the user
-        filter_query = {'ID': projectid}
-        join_query = {'$push': {'Users': user}}
-        projects_collection.update_one(filter_query, join_query)
-        return jsonify({'status': 'success', 'message': "user added"})
-    else:
-        # logic telling frontend that user is not authorized
-        return jsonify({'status': 'error', 'message': 'user not authorized'})
+    return jsonify({'status': 'success', 'message': "user added"})
     
 
 # TODO: Connect with front end. Convert to POST

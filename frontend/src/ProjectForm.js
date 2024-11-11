@@ -1,12 +1,17 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './ProjectForm.css';
 
-const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
+const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = []}) => {
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
   const [projectid, setProjectid] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [joinid, setJoinid] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
+
+  useEffect(() => {
+    console.log("Authorized Projects Updated:", authorizedProjects);
+  }, [authorizedProjects]);
 
   const handleMake = async (event) => {
     event.preventDefault();
@@ -30,7 +35,7 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
       console.log("Response from Flask:", data.message);
 
       if (data.status === "success") {
-        alert(`Project ${projectName} created with project ID ${projectid}`);
+        alert(`Project ${projectName} created by ${username} with project ID ${projectid}`);
         onMake();  // Successfully created project
       } else {
         alert(data.message); // Display error if project creation fails
@@ -43,8 +48,36 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
     }
 
   };
+  
+  const handleProjectSelect = (event) => {
+    const projectID = event.target.value;
+    setSelectedProject(projectID);
+    setJoinid("");
+  }
+
+  const handleInputChange = (e) => {
+    setJoinid(e.target.value);
+    setSelectedProject(""); // Clear dropdown selection when user types in joinid input
+  };
+
+  const resetDropdown = () => {
+    setSelectedProject("");
+  };
 
   const handleJoin = async (event) => {
+    if (selectedProject && joinid) {
+      alert("Please select only one option: either a project from the dropdown or enter a specific ID.");
+      return;
+    }
+
+    // Check if neither is filled
+    if (!selectedProject && !joinid) {
+        alert("Please select a project from the dropdown or enter a specific ID.");
+        return;
+    }
+    const projectToJoin = selectedProject || joinid; // Use either dropdown selection or input ID
+    console.log("Joining project with ID:", projectToJoin);
+
     event.preventDefault();
     const endpoint = 'join_project';
 
@@ -56,7 +89,7 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
         },
         body: JSON.stringify({
           username,
-          joinid
+          projectid:projectToJoin
         }),
       });
 
@@ -64,8 +97,10 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
       console.log("Response from Flask:", data.message);
 
       if (data.status === "success") {
-        alert(`Joined project with project ID ${joinid}`);
+        alert(`Joined project with project ID ${projectid}`);
         onJoin();  // Successfully created project
+        resetDropdown();
+        setJoinid("");
       } else {
         alert(data.message); // Display error if project creation fails
       }
@@ -121,10 +156,26 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser}) => {
         </form>
         <h2>Join</h2>
         <form className="join-form">
-          <select className="dropdown-menu">
-            <option>Select Project</option>
-            {/* Add options dynamically here */}
-          </select>
+          <div className="dropdown-section">
+            <div className="dropdown-container">
+            <select className="dropdown-menu" 
+              value={selectedProject} 
+              onChange={handleProjectSelect}
+            >
+              <option value="" disabled>Select a project</option>
+              {authorizedProjects.map((project) => {
+              console.log("Project ID:", project.ID);
+              console.log("Project Name:", project.Project_Name);
+              return (
+                <option key={project._id} value={project.ID}>
+                  {project.Project_Name}
+                </option>
+              );
+              })}
+            </select>
+            <button type="button" className="clear-button" onClick={resetDropdown}>Clear</button>
+            </div>
+          </div>
           <input
             type="text"
             placeholder="Enter ID here"

@@ -1,11 +1,11 @@
-// src/LoginPage.js
 import React, { useState } from "react";
 import "./LoginPage.css";
 
-const LoginPage = ({ onLogin, setUser}) => {
+const LoginPage = ({ onLogin, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [authorizedProjects, setAuthorizedProjects] = useState([]);
 
   const submitCredentials = async (event) => {
     event.preventDefault();
@@ -30,28 +30,24 @@ const LoginPage = ({ onLogin, setUser}) => {
           alert("Sign-up successful! You can now log in.");
           setIsSignUp(false);  // Switch back to login mode
         } else {
-          setUser(username);  // Save the logged-in user for the session
-          onLogin();  // Change app state to logged in
+          setUsername(username);  // Save the logged-in user for the session
+          setUser(username)
+          // setAuthorizedProjects(data.authorizedProjects);
+          onLogin(username);
         }
       } else {
         alert(data.message);  // Display error if sign-in/sign-up fails
       }
       
-      // Clear the input fields
-      setUsername("");
-      setPassword("");
-      
     } catch (error) {
       console.error("Error submitting credentials:", error);
       alert("There was an error. Please try again.");
-      
-      // Clear the input fields
-      setUsername("");
-      setPassword("");
+
     }
   };
 
   return (
+    
     <div className="login-page">
       <div className="wavy-bg"></div>
       <div className="login-box">

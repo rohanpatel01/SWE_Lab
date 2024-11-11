@@ -89,3 +89,28 @@ body {
   .logout-button:hover {
     background-color: #154c9e;
   }
+
+  .dropdown-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  
+  .dropdown-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .dropdown-menu {
+    margin-right: 5px;
+  }
+  
+  .clear-button {
+    padding: 5px 5px;
+    /* background-color: #f0f0f0;
+    border: 1px solid #ccc; */
+    cursor: pointer;
+  }
+  

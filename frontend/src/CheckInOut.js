@@ -2,7 +2,7 @@
 import React, { useState, useEffect} from 'react';
 import './CheckInOut.css'; 
 
-const CheckInOut = ({ onBack, username, password }) => {
+const CheckInOut = ({ onBack, username, projectId }) => {
   const [hwSet1, setHwSet1] = useState({ capacity: '', available: '', request: '' });
   const [hwSet2, setHwSet2] = useState({ capacity: '', available: '', request: '' });
 
@@ -22,7 +22,7 @@ useEffect(() => {
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          projectID: defaultProjectID
+          projectID: projectId 
         }),
       });
   
@@ -66,7 +66,7 @@ const handleCheckOut = async () => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        projectID: 11,
+        projectID: projectId,
         HW_Set_1_Request: hwSet1.request,
         HW_Set_2_Request: hwSet2.request
       }),
@@ -99,7 +99,7 @@ const handleCheckIn = async () => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        projectID: defaultProjectID,
+        projectID: projectId,
         HW_Set_1_Request: hwSet1.request,
         HW_Set_2_Request: hwSet2.request
       }),
