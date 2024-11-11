@@ -8,11 +8,10 @@ const CheckInOut = ({ onBack, username, projectId }) => {
 
 const [defaultProjectID, setDefaultProjectID] = useState(1);
 
-useEffect(() => {
 
-  const fetchData = async () => {
+const fetchData = async () => {
 
-    const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
+  const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
 
     try {
       const response = await fetch(`${baseUrl}/fetchData`, {
@@ -33,23 +32,33 @@ useEffect(() => {
         console.log("Error: Bad JSON response");
       }
 
-      setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity });
-      setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
+    console.log("Prev hwSet1 Request: ", hwSet1.request)
 
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    // setHwSet1({ ...hwSet1, available: data.HwSet1_available, capacity: data.HwSet1_capacity});
+    // setHwSet2({ ...hwSet2, available: data.HwSet2_available, capacity: data.HwSet2_capacity});
 
+    setHwSet1((prevHwSet1) => ({
+      ...prevHwSet1,
+      available: data.HwSet1_available,
+      capacity: data.HwSet1_capacity,
+    }));
+
+    setHwSet2((prevHwSet2) => ({
+      ...prevHwSet2,
+      available: data.HwSet2_available,
+      capacity: data.HwSet2_capacity,
+    }));
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+useEffect(() => {
   const periodic_function_call = setInterval(fetchData, 3000);
   return () => clearInterval(periodic_function_call); // on unmount we want to clear this
 
 }, []); // Empty array means this only runs on mount
-
-
-// Function to fetch the capacity and availability of the hardware sets 
-// const fetchHardwareSetData = async () => {
-// }
 
 const handleCheckOut = async () => {
 
@@ -57,7 +66,6 @@ const handleCheckOut = async () => {
 
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
 
-  // Make query to python flask back end and console.log the availability we have for a given hardware set
   try {
     const response = await fetch(`${baseUrl}/CheckOut`, {
       method: "POST",
@@ -77,9 +85,10 @@ const handleCheckOut = async () => {
     if (response.ok) {
       console.log("Printing Data: " + data)
     } else {
-      console.log("Error: Bad JSON response");
+      alert(data.message);
     }
 
+    fetchData()
 
   } catch (error) {
     console.log("Error")
@@ -110,8 +119,11 @@ const handleCheckIn = async () => {
     if (response.ok) {
       console.log("Printing Data: " + data)
     } else {
-      console.log("Error: Bad JSON response");
+      alert(data.message);
     }
+
+    fetchData()
+
 
 
   } catch (error) {
@@ -167,8 +179,8 @@ const handleCheckIn = async () => {
           <input
             type="text"
             placeholder="Request"
-            value={hwSet2.request}
-            onChange={(e) => setHwSet2({ ...hwSet2, request: e.target.value })}
+            value={hwSet2.request} 
+            onChange={(e) => setHwSet2({ ...hwSet2, request: e.target.value })} 
           />
         </div>
       </div>
