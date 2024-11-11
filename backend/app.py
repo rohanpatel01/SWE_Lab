@@ -105,7 +105,7 @@ def sign_in():
     if not username or username.strip() == "":
         return jsonify({'status': 'error', 'message': 'Invalid Username: Cannot be empty'})
     if not password or password.strip() == "":
-        return jsonify({'status': 'error', 'message': 'Invalid Username: Cannot be empty'})
+        return jsonify({'status': 'error', 'message': 'Invalid Password: Cannot be empty'})
 
     encrypted_password = encrypt(password, N, D)
     print("Username: ", username)
