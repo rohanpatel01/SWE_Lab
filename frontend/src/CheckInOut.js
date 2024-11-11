@@ -134,7 +134,7 @@ const handleCheckIn = async () => {
 
   return (
     <div className="check-in-out-container">
-      <h1>{username}</h1>
+      <h1>{username}: {projectId}</h1>
       <h1>Check Out/In</h1>
       <div className="hardware-set">
         <div className="row">

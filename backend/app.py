@@ -266,8 +266,8 @@ def CheckOut():
     db = client['SWELAB']
     resources_collection = db['Resources']
     projects_collection = db['Projects']
-
-    project = projects_collection.find_one({'ID': projectID})
+    print("test: ", projectID)
+    project = projects_collection.find_one({'ID': int(projectID)})
     project_availabiltiy_HW1 = project.get('HW1Units')
     project_availabiltiy_HW2 = project.get('HW2Units')
 
@@ -345,7 +345,7 @@ def CheckIn():
     resources_collection = db['Resources']
     projects_collection = db['Projects']
 
-    project = projects_collection.find_one({'ID': projectID})
+    project = projects_collection.find_one({'ID': int(projectID)})
     project_availabiltiy_HW1 = project.get('HW1Units')
     project_availabiltiy_HW2 = project.get('HW2Units')
 

@@ -6,11 +6,16 @@ import CheckInOut from "./CheckInOut";
 function App() {
   const [page, setPage] = useState("login");
   const [user, setUser] = useState(""); // Save the logged-in user for the session
+  const [projectid, setProjectID] = useState(-1);
   const [authorizedProjects, setAuthorizedProjects] = useState([]);
   
   const handleUser = (username) => {
     setUser(username);
   };
+
+  const handleProjectid = (projectid) => {
+    setProjectID(projectid)
+  }
 
   const handleLogin = async (user) => {
     setUser(user);
@@ -54,12 +59,14 @@ function App() {
           username={user}
           setUser={handleUser}
           authorizedProjects={authorizedProjects}
+          setJoinedProject={handleProjectid}
         />
       )}
       {page === "checkInOut" && (
         <CheckInOut 
           username={user}
           onBack={() => handleNavigation("projectForm")} 
+          projectId={projectid}
         />
       )}
     </div>

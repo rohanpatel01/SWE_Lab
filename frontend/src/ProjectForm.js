@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './ProjectForm.css';
 
-const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = []}) => {
+const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = [], setJoinedProject}) => {
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
   const [projectid, setProjectid] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -97,10 +97,12 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
       console.log("Response from Flask:", data.message);
 
       if (data.status === "success") {
-        alert(`Joined project with project ID ${projectid}`);
+        alert(`Joined project with project ID ${projectToJoin}`);
+        setJoinedProject(projectToJoin);
         onJoin();  // Successfully created project
         resetDropdown();
         setJoinid("");
+
       } else {
         alert(data.message); // Display error if project creation fails
       }
