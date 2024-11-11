@@ -21,7 +21,7 @@ const fetchData = async () => {
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          projectID: projectId 
+          projectID: projectId
         }),
       });
   
