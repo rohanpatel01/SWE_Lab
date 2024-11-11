@@ -77,7 +77,7 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
     }
     const projectToJoin = selectedProject || joinid; // Use either dropdown selection or input ID
     console.log("Joining project with ID:", projectToJoin);
-
+    
     event.preventDefault();
     const endpoint = 'join_project';
 

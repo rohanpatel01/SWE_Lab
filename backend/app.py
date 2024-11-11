@@ -190,6 +190,15 @@ def join_project():
     if not check_project_exists(projectid):
         return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
     
+    # user = users_collection.find_one({'username': username, 'password': encrypted_password})
+    # if user:
+    #     return jsonify({'status': 'success', 'message': 'Signed in successfully'})
+    # else:
+    #     return jsonify({'status': 'error', 'message': 'Incorrect username or password'})
+    projects_collection.update_one(
+    {"ID": projectid},  # Filter to locate the specific document
+    {"$push": {"Authorized_Users": user}}  # Push the new user to the 'members' array
+    )
     return jsonify({'status': 'success', 'message': "user added"})
     
 
