@@ -16,7 +16,7 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
   const handleMake = async (event) => {
     event.preventDefault();
     const endpoint = 'create_project';
-
+  
     try {
       const response = await fetch(`${baseUrl}/${endpoint}`, {
         method: "POST",
@@ -30,24 +30,29 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
           username
         }),
       });
-
+  
       const data = await response.json();
       console.log("Response from Flask:", data.message);
-
+  
       if (data.status === "success") {
         alert(`Project ${projectName} created by ${username} with project ID ${projectid}`);
-        onMake();  // Successfully created project
+  
+        // Update the authorized projects to include the new project
+        const newProject = { ID: projectid, Project_Name: projectName };
+        const updatedProjects = [...authorizedProjects, newProject];
+        setJoinedProject(projectid); // Set the newly created project as the joined project
+        setSelectedProject(projectid); // Set the dropdown to the new project
+        onMake(); // Successfully created project
       } else {
         alert(data.message); // Display error if project creation fails
       }
-
-    }
-    catch (error) {
+  
+    } catch (error) {
       console.error("Error making project:", error);
       alert("There was an error. Please try again.");
     }
-
   };
+  
   
   const handleProjectSelect = (event) => {
     const projectID = event.target.value;
