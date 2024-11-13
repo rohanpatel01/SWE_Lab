@@ -190,17 +190,31 @@ def join_project():
     if not check_project_exists(projectid):
         return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
     
-    # user = users_collection.find_one({'username': username, 'password': encrypted_password})
-    # if user:
-    #     return jsonify({'status': 'success', 'message': 'Signed in successfully'})
-    # else:
-    #     return jsonify({'status': 'error', 'message': 'Incorrect username or password'})
     projects_collection.update_one(
     {"ID": projectid},  # Filter to locate the specific document
     {"$push": {"Authorized_Users": user}}  # Push the new user to the 'members' array
     )
     return jsonify({'status': 'success', 'message': "user added"})
     
+@app.route('/goto_project', methods=['POST'])
+def goto_project():
+    data = request.get_json()
+
+    # Check if data is None or missing required fields
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+    
+    user = data.get('username')
+    projectid = data.get('projectid')
+
+    if not projectid or not user:
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+    projectid = int(projectid)
+    if not check_project_exists(projectid):
+        return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
+    
+    return jsonify({'status': 'success', 'message': "user added"})
 
 # TODO: Connect with front end. Convert to POST
 @app.route('/leave_project', methods=['POST'])
