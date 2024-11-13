@@ -190,17 +190,32 @@ def join_project():
     if not check_project_exists(projectid):
         return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
     
-    # user = users_collection.find_one({'username': username, 'password': encrypted_password})
-    # if user:
-    #     return jsonify({'status': 'success', 'message': 'Signed in successfully'})
-    # else:
-    #     return jsonify({'status': 'error', 'message': 'Incorrect username or password'})
+
     projects_collection.update_one(
     {"ID": projectid},  # Filter to locate the specific document
     {"$push": {"Authorized_Users": user}}  # Push the new user to the 'members' array
     )
     return jsonify({'status': 'success', 'message': "user added"})
     
+@app.route('/goto_project', methods=['POST'])
+def goto_project():
+    data = request.get_json()
+
+    # Check if data is None or missing required fields
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+    
+    user = data.get('username')
+    projectid = data.get('projectid')
+
+    if not projectid or not user:
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+    projectid = int(projectid)
+    if not check_project_exists(projectid):
+        return jsonify({'status': 'error', 'message': 'Project does not exist'}), 400
+    
+    return jsonify({'status': 'success', 'message': "user added"})
 
 # TODO: Connect with front end. Convert to POST
 @app.route('/leave_project', methods=['POST'])
@@ -258,16 +273,14 @@ def CheckOut():
     hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else 0
 
     if hw1_request < 0 or hw2_request < 0:
-        return jsonify({"message": "Invalid request. Cannot request negative values."}), 400
-
-    if hw1_request == 0 and hw2_request == 0:
-        return jsonify({"message": "Invalid request. Make sure request values are postive integers."}), 400
+        return jsonify({"message": "Invalid request. Please provide a valid amount to check out."}), 400
 
     db = client['SWELAB']
     resources_collection = db['Resources']
     projects_collection = db['Projects']
 
-    project = projects_collection.find_one({'ID': projectID})
+    project = projects_collection.find_one({'ID': int(projectID)})
+    # print("Project: ", project)
     project_availabiltiy_HW1 = project.get('HW1Units')
     project_availabiltiy_HW2 = project.get('HW2Units')
 
@@ -291,15 +304,24 @@ def CheckOut():
             amount_HW1_to_remove = hw1_request
             amount_projectID_to_checkout = hw1_request
 
-        resources_collection.update_one(
+        resouces_ret = resources_collection.update_one(
             {'Name': "HW_Set_1"},
             {'$set': {'Availability' : hw1_availability - amount_HW1_to_remove}}     # Update operation
         )
+        # print("resouces_ret: ", resouces_ret)
+        # print("project_availabiltiy_HW1: ", project_availabiltiy_HW1)
+        # print("amount_projectID_to_checkout: ", amount_projectID_to_checkout)
+        print("project_availabiltiy_HW1 + amount_projectID_to_checkout: ", project_availabiltiy_HW1 + amount_projectID_to_checkout)
 
-        projects_collection.update_one(
-            {'ID': projectID},  # Filter criteria
+        projects_ret = projects_collection.update_one(
+            {'ID': int(projectID)},  # Filter criteria
             {'$set': {'HW1Units': project_availabiltiy_HW1 + amount_projectID_to_checkout }}     # Update operation
         )
+
+        project_after = projects_collection.find_one({'ID': int(projectID)})
+        print("projects_ret: ", projects_ret)
+
+        print("Project After: ", project_after)
 
     # Perform Hardware Set 2 operations
     if hardWareSet2 and hw2_request:
@@ -322,7 +344,7 @@ def CheckOut():
         )
 
         projects_collection.update_one(
-            {'ID': projectID},  
+            {'ID': int(projectID)},  
             {'$set': {'HW2Units': project_availabiltiy_HW2 + amount_projectID_to_checkout }}   
         )
 
@@ -330,22 +352,27 @@ def CheckOut():
         return jsonify({"message": "Error. Could not process entire check out value"}), 400
     else:
         return jsonify({"message": "Check Out Successful"}), 200
+    
 
 @app.route('/CheckIn', methods=['POST'])
 def CheckIn():
     data = request.get_json()
     projectID = data.get('projectID')
-    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else -1
-    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else -1
+    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else 0
+    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else 0
 
+    # print("HW1 Request: " + str(hw1_request) + " HW2 Request: " + str(hw2_request))
     if hw1_request < 0 or hw2_request < 0:
-        return jsonify({"message": "Check out value cannot be negative"}), 400
+        return jsonify({"message": "Invalid request. Please provide a valid amount to check in."}), 400
+    
+    # if hw1_request == 0 and hw2_request == 0:
+    #     return jsonify({"message": "Invalid request. Please provide a valid amount to check in."}), 400
 
     db = client['SWELAB']
     resources_collection = db['Resources']
     projects_collection = db['Projects']
 
-    project = projects_collection.find_one({'ID': projectID})
+    project = projects_collection.find_one({'ID': int(projectID)})
     project_availabiltiy_HW1 = project.get('HW1Units')
     project_availabiltiy_HW2 = project.get('HW2Units')
 
@@ -353,10 +380,7 @@ def CheckIn():
     hardWareSet1 = resources_collection.find_one({'Name': 'HW_Set_1'})
     hardWareSet2 = resources_collection.find_one({'Name': 'HW_Set_2'})
 
-    error = False
-
     # Perform Hardware Set 1 operations
-    # Attempt to check in as many as possible
     if hardWareSet1 and hw1_request:
         hw1_availability = int(hardWareSet1.get('Availability'))
         hw1_capacity = int(hardWareSet1.get('Capacity'))
@@ -364,15 +388,11 @@ def CheckIn():
         amount_HW1_to_add = 0
         amount_projectID_to_checkin = 0
 
-        if hw1_request + hw1_availability <= hw1_capacity:
+        if (project_availabiltiy_HW1 >= hw1_request) and (hw1_request + hw1_availability <= hw1_capacity):
             amount_HW1_to_add = hw1_request
             amount_projectID_to_checkin = hw1_request
-            print("correct")
         else:
-            error = True
-            amount_HW1_to_add = hw1_capacity - hw1_availability
-            amount_projectID_to_checkin = hw1_capacity - hw1_availability
-
+            return jsonify({"message": "Invalid rerequest. Project does not have the requested quantity to check in or request field cannot be empty."}), 400
 
         resources_collection.update_one(
             {'Name': "HW_Set_1"},
@@ -380,7 +400,7 @@ def CheckIn():
         )
 
         projects_collection.update_one(
-            {'ID': projectID},  
+            {'ID': int(projectID)},  
             {'$set': {'HW1Units': project_availabiltiy_HW1 - amount_projectID_to_checkin }}     
         )
 
@@ -396,13 +416,11 @@ def CheckIn():
         amount_HW2_to_add = 0
         amount_projectID_to_checkin = 0
 
-        if hw2_request + hw2_availability <= hw2_capacity:
+        if (project_availabiltiy_HW2 >= hw2_request) and (hw2_request + hw2_availability <= hw2_capacity):
             amount_HW2_to_add = hw2_request
             amount_projectID_to_checkin = hw2_request
         else:
-            error = True
-            amount_HW2_to_add = hw2_capacity - hw2_availability
-            amount_projectID_to_checkin = hw2_capacity - hw2_availability
+            return jsonify({"message": "Invalid rerequest. Project does not have the requested quantity to check in or request field cannot be empty."}), 400
 
         resources_collection.update_one(
             {'Name': "HW_Set_2"},
@@ -410,14 +428,12 @@ def CheckIn():
         )
 
         projects_collection.update_one(
-            {'ID': projectID},  
+            {'ID': int(projectID)},  
             {'$set': {'HW2Units': project_availabiltiy_HW2 - amount_projectID_to_checkin }}     
         )
 
-    if error:
-        return jsonify({"message": "Error. Could not process entire check in value"}), 400
-    else:
-        return jsonify({"message": "Check In Successful"}), 200
+    
+    return jsonify({"message": "Check In Successful"}), 200
 
 
 

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './ProjectForm.css';
 
-const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = []}) => {
+const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedProjects = [], setJoinedProject}) => {
   const baseUrl = process.env.REACT_APP_API_URL.replace(/\/+$/, '');
   const [projectid, setProjectid] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -65,18 +65,14 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
   };
 
   const handleJoin = async (event) => {
-    if (selectedProject && joinid) {
-      alert("Please select only one option: either a project from the dropdown or enter a specific ID.");
-      return;
-    }
 
     // Check if neither is filled
-    if (!selectedProject && !joinid) {
-        alert("Please select a project from the dropdown or enter a specific ID.");
+    if (!joinid) {
+        alert("Please enter a specific ID.");
         return;
     }
-    const projectToJoin = selectedProject || joinid; // Use either dropdown selection or input ID
-    console.log("Joining project with ID:", projectToJoin);
+    const projectToJoin = joinid; // Use either dropdown selection or input ID
+    console.log("Going to project with ID:", projectToJoin);
     
     event.preventDefault();
     const endpoint = 'join_project';
@@ -97,10 +93,12 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
       console.log("Response from Flask:", data.message);
 
       if (data.status === "success") {
-        alert(`Joined project with project ID ${projectid}`);
+        alert(`Joining project with project ID ${projectToJoin}`);
+        setJoinedProject(projectToJoin);
         onJoin();  // Successfully created project
         resetDropdown();
         setJoinid("");
+
       } else {
         alert(data.message); // Display error if project creation fails
       }
@@ -111,6 +109,52 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
       alert("There was an error. Please try again.");
     }
   };
+
+  const handleGoTo = async (event) => {
+
+    if (!selectedProject) {
+        alert("Please select a project from the dropdown menu.");
+        return;
+    }
+    const projectToJoin = selectedProject; // Use either dropdown selection or input ID
+    console.log("Going to project with ID:", projectToJoin);
+    
+    event.preventDefault();
+    const endpoint = 'goto_project';
+
+    try {
+      const response = await fetch(`${baseUrl}/${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          projectid:projectToJoin
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Response from Flask:", data.message);
+
+      if (data.status === "success") {
+        alert(`Going to project with project ID ${projectToJoin}`);
+        setJoinedProject(projectToJoin);
+        onJoin();  // Successfully created project
+        resetDropdown();
+        setJoinid("");
+
+      } else {
+        alert(data.message); // Display error if project creation fails
+      }
+
+    }
+    catch (error) {
+      console.error("Error going to project:", error);
+      alert("There was an error. Please try again.");
+    }
+  };
+
 
   const handleLogout = async (event) => {
     event.preventDefault();
@@ -124,7 +168,7 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
     <div className="project-page">
       <div className="project-box">
         <h1 className="title">Projects</h1>
-        <h2>Create</h2>
+        <h2>Create New Project</h2>
         <form className="create-form">
           <div className="input-field">
             <label htmlFor="id">ID</label>
@@ -154,9 +198,10 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
           </div>
           <button type="button" className="action-button" onClick={handleMake}>Make</button>
         </form>
-        <h2>Join</h2>
+        <h2>Go To Authorized Project</h2>
         <form className="join-form">
           <div className="dropdown-section">
+          <button type="button" className="clear-button" onClick={resetDropdown}>Clear Dropdown</button>
             <div className="dropdown-container">
             <select className="dropdown-menu" 
               value={selectedProject} 
@@ -173,9 +218,11 @@ const ProjectForm = ({ onMake, onJoin, onLogout, username, setUser, authorizedPr
               );
               })}
             </select>
-            <button type="button" className="clear-button" onClick={resetDropdown}>Clear</button>
+
+            <button type="button" className="goto-button" onClick={handleGoTo}>Go To Project</button>
             </div>
           </div>
+          <h2>Join Project with Specific ID</h2>
           <input
             type="text"
             placeholder="Enter ID here"
