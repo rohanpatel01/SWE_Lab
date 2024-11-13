@@ -65,8 +65,13 @@ function App() {
       {page === "checkInOut" && (
         <CheckInOut 
           username={user}
-          onBack={() => handleNavigation("projectForm")} 
-          projectId={projectid}
+          onBack={() => {
+            setAuthorizedProjects(authorizedProjects)
+            handleLogin(user)
+            // handleUser()
+            handleNavigation("projectForm")} 
+          }
+            projectId={projectid}
         />
       )}
     </div>
