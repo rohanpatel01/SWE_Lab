@@ -335,9 +335,10 @@ def CheckOut():
 def CheckIn():
     data = request.get_json()
     projectID = data.get('projectID')
-    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else -1
-    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else -1
+    hw1_request = int(data.get('HW_Set_1_Request')) if data.get('HW_Set_1_Request') else 0
+    hw2_request = int(data.get('HW_Set_2_Request')) if data.get('HW_Set_2_Request') else 0
 
+    # print("HW1 Request: " + str(hw1_request) + " HW2 Request: " + str(hw2_request))
     if hw1_request < 0 or hw2_request < 0:
         return jsonify({"message": "Check out value cannot be negative"}), 400
 
